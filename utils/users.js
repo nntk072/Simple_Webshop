@@ -13,9 +13,9 @@
  * properties do not have that restriction.
  */
 const data = {
-  // make copies of users (prevents changing from outside this module/file)
-  users: require('../users.json').map(user => ({...user })),
-  roles: ['customer', 'admin']
+    // make copies of users (prevents changing from outside this module/file)
+    users: require("../users.json").map((user) => ({ ...user })),
+    roles: ["customer", "admin"],
 };
 
 /**
@@ -26,8 +26,8 @@ const data = {
  * database to a known state directly.
  */
 const resetUsers = () => {
-  // make copies of users (prevents changing from outside this module/file)
-  data.users = require('../users.json').map(user => ({...user }));
+    // make copies of users (prevents changing from outside this module/file)
+    data.users = require("../users.json").map((user) => ({ ...user }));
 };
 
 /**
@@ -35,17 +35,17 @@ const resetUsers = () => {
  * @returns {string}
  */
 const generateId = () => {
-  let id;
+    let id;
 
-  do {
-    // Generate unique random id that is not already in use
-    // Shamelessly borrowed from a Gist. See:
-    // https://gist.github.com/gordonbrander/2230317
+    do {
+        // Generate unique random id that is not already in use
+        // Shamelessly borrowed from a Gist. See:
+        // https://gist.github.com/gordonbrander/2230317
 
-    id = Math.random().toString(36).substr(2, 9);
-  } while (data.users.some(u => u._id === id));
+        id = Math.random().toString(36).substr(2, 9);
+    } while (data.users.some((u) => u._id === id));
 
-  return id;
+    return id;
 };
 
 /**
@@ -54,7 +54,7 @@ const generateId = () => {
  * @param {string} email
  * @returns {boolean}
  */
-const emailInUse = email => data.users.some(user => user.email === email);
+const emailInUse = (email) => data.users.some((user) => user.email === email);
 
 /**
  * Return user object with the matching email and password or undefined if not found
@@ -67,8 +67,10 @@ const emailInUse = email => data.users.some(user => user.email === email);
  * @returns {Object|undefined}
  */
 const getUser = (email, password) => {
-  const user = data.users.find(user => user.email === email && user.password === password);
-  return user && {...user };
+    const user = data.users.find(
+        (user) => user.email === email && user.password === password
+    );
+    return user && { ...user };
 };
 
 /**
@@ -80,9 +82,10 @@ const getUser = (email, password) => {
  * @param {string} userId
  * @returns {Object|undefined}
  */
-const getUserById = userId => {
-  // TODO: 8.4 Find user by user id
-  throw new Error('Not Implemented');
+const getUserById = (userId) => {
+    // TODO: 8.4 Find user by user id
+    const user = data.users.find((user) => user._id === userId);
+    return user && { ...user };
 };
 
 /**
@@ -91,10 +94,15 @@ const getUserById = userId => {
  * @param {string} userId
  * @returns {Object|undefined} deleted user or undefined if user does not exist
  */
-const deleteUserById = userId => {
-  // TODO: 8.4 Delete user with a given id
-  // Hint: Array's findIndex() with user ID can could be used to find the user, and Array's splice() method can be used to "extract" the user object.
-  throw new Error('Not Implemented');
+const deleteUserById = (userId) => {
+    // TODO: 8.4 Delete user with a given id
+    // Hint: Array's findIndex() with user ID can could be used to find the user, and Array's splice() method can be used to "extract" the user object.
+    const index = data.users.findIndex((user) => user._id === userId);
+    if (index === -1) return undefined;
+
+    const deletedUser = { ...data.users[index] };
+    data.users.splice(index, 1);
+    return deletedUser;
 };
 
 /**
@@ -105,7 +113,7 @@ const deleteUserById = userId => {
  *
  * @returns {Array<Object>} all users
  */
-const getAllUsers = () => data.users.map(user => ({...user }));
+const getAllUsers = () => data.users.map((user) => ({ ...user }));
 
 /**
  * Save new user
@@ -119,13 +127,14 @@ const getAllUsers = () => data.users.map(user => ({...user }));
  * @param {Object} user
  * @returns {Object} copy of the created user
  */
-const saveNewUser = user => {
-  // Use generateId() to assign a unique id to the newly created user.
-  const newUser = {...user };
-  newUser._id = generateId();
-  if (!newUser.role) newUser.role = 'customer';
-  data.users.push(newUser);
-  return {...newUser };
+const saveNewUser = (user) => {
+    // Use generateId() to assign a unique id to the newly created user.
+    const newUser = { ...user };
+    newUser._id = generateId();
+    if (!newUser.role) newUser.role = "customer";
+    newUser.role = "customer";
+    data.users.push(newUser);
+    return { ...newUser };
 };
 
 /**
@@ -142,8 +151,14 @@ const saveNewUser = user => {
  * @throws {Error} error object with message "Unknown role"
  */
 const updateUserRole = (userId, role) => {
-  // TODO: 8.4 Update user's role
-  throw new Error('Not Implemented');
+    // TODO: 8.4 Update user's role
+    const index = data.users.findIndex((user) => user._id === userId);
+    if (index === -1) return undefined;
+    if (!data.roles.includes(role)) throw new Error("Unknown role");
+    const updatedUser = { ...data.users[index] };
+    updatedUser.role = role;
+    data.users[index] = updatedUser;
+    return { ...updatedUser };
 };
 
 /**
@@ -153,27 +168,28 @@ const updateUserRole = (userId, role) => {
  * fields before saving it.
  *
  * @param {Object} user user object to be validated
- * @returns {Array<string>} Array of error messages or empty array if user is valid. 
+ * @returns {Array<string>} Array of error messages or empty array if user is valid.
  */
-const validateUser = user => {
-  const errors = [];
+const validateUser = (user) => {
+    const errors = [];
 
-  if (!user.name) errors.push('Missing name');
-  if (!user.email) errors.push('Missing email');
-  if (!user.password) errors.push('Missing password');
-  if (user.role && !data.roles.includes(user.role)) errors.push('Unknown role');
+    if (!user.name) errors.push("Missing name");
+    if (!user.email) errors.push("Missing email");
+    if (!user.password) errors.push("Missing password");
+    if (user.role && !data.roles.includes(user.role))
+        errors.push("Unknown role");
 
-  return errors;
+    return errors;
 };
 
 module.exports = {
-  deleteUserById,
-  emailInUse,
-  getAllUsers,
-  getUser,
-  getUserById,
-  resetUsers,
-  saveNewUser,
-  updateUserRole,
-  validateUser
+    deleteUserById,
+    emailInUse,
+    getAllUsers,
+    getUser,
+    getUserById,
+    resetUsers,
+    saveNewUser,
+    updateUserRole,
+    validateUser,
 };
