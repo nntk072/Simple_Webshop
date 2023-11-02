@@ -9,7 +9,7 @@ const {
     saveNewUser,
     validateUser,
 } = require("./utils/users");
-
+const { getCurrentUser } = require("./auth/auth");
 /**
  * Known API routes and their allowed methods
  *
@@ -108,6 +108,14 @@ const handleRequest = async (request, response) => {
     // GET all users
     if (filePath === "/api/users" && method.toUpperCase() === "GET") {
         // TODO: 8.5 Add authentication (only allowed to users with role "admin")
+        const currentUser = await getCurrentUser(request);
+
+        if (!currentUser) return responseUtils.basicAuthChallenge(response);
+
+        if (currentUser && currentUser.role === "customer") {
+            return responseUtils.forbidden(response);
+        }
+
         return responseUtils.sendJson(response, getAllUsers());
     }
 
