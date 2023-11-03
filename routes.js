@@ -8,8 +8,12 @@ const {
     getAllUsers,
     saveNewUser,
     validateUser,
+    getUserById,
+    updateUserRole,
+    deleteUserById
 } = require("./utils/users");
 const { getCurrentUser } = require("./auth/auth");
+
 /**
  * Known API routes and their allowed methods
  *
@@ -64,6 +68,11 @@ const matchUserId = (url) => {
     return matchIdRoute(url, "users");
 };
 
+const extractUserId = (url) => {
+    const parts = url.split('/');
+    return parts[parts.length - 1]; 
+}
+
 const handleRequest = async (request, response) => {
     const { url, method, headers } = request;
     const filePath = new URL(url, `http://${headers.host}`).pathname;
@@ -85,7 +94,40 @@ const handleRequest = async (request, response) => {
         // - getUserById(userId) from /utils/users.js
         // - notFound(response) from  /utils/responseUtils.js
         // - sendJson(response,  payload)  from  /utils/responseUtils.js can be used to send the requested data in JSON format
-        throw new Error("Not Implemented");
+        const currentUser = await getCurrentUser(request);
+        if (!currentUser) return responseUtils.basicAuthChallenge(response);
+
+        if (currentUser && currentUser.role !== "admin") {
+            return responseUtils.forbidden(response);
+        }
+
+        if (method.toUpperCase() === "OPTIONS")
+            return sendOptions(filePath, response);
+       
+        const userId = extractUserId(filePath);
+        let user = getUserById(userId);
+        if (!user)
+            return responseUtils.notFound(response);
+
+        if (method.toUpperCase() === "GET")
+            return responseUtils.sendJson(response, user);
+
+        if (method.toUpperCase() === "PUT"){
+            const json = await parseBodyJson(request);
+            if (!json.role)
+                return responseUtils.badRequest(response, "Message");
+            if (json.role !== "admin" && json.role !== "customer")
+                return responseUtils.badRequest(response, "message");
+            if (json.role === "admin")
+                user = updateUserRole(userId, "admin")
+            return responseUtils.sendJson(response, user);
+        }
+
+        if (method.toUpperCase() === "DELETE") {
+            if (currentUser.role === "admin")
+                user = deleteUserById(userId)
+            return responseUtils.sendJson(response, user);
+        }
     }
 
     // Default to 404 Not Found if unknown url
