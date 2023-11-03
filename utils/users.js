@@ -68,7 +68,7 @@ const emailInUse = (email) => data.users.some((user) => user.email === email);
  */
 const getUser = (email, password) => {
     const user = data.users.find(
-        (user) => user.email === email && user.password === password
+        (usr) => usr.email === email && usr.password === password
     );
     return user && { ...user };
 };
@@ -84,7 +84,7 @@ const getUser = (email, password) => {
  */
 const getUserById = (userId) => {
     // TODO: 8.4 Find user by user id
-    const user = data.users.find((user) => user._id === userId);
+    const user = data.users.find((usr) => usr._id === userId);
     return user && { ...user };
 };
 

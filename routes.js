@@ -71,7 +71,7 @@ const matchUserId = (url) => {
 const extractUserId = (url) => {
     const parts = url.split('/');
     return parts[parts.length - 1]; 
-}
+};
 
 const handleRequest = async (request, response) => {
     const { url, method, headers } = request;
@@ -119,13 +119,13 @@ const handleRequest = async (request, response) => {
             if (json.role !== "admin" && json.role !== "customer")
                 return responseUtils.badRequest(response, "message");
             if (json.role === "admin")
-                user = updateUserRole(userId, "admin")
+                user = updateUserRole(userId, "admin");
             return responseUtils.sendJson(response, user);
         }
 
         if (method.toUpperCase() === "DELETE") {
             if (currentUser.role === "admin")
-                user = deleteUserById(userId)
+                user = deleteUserById(userId);
             return responseUtils.sendJson(response, user);
         }
     }
