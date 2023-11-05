@@ -12,6 +12,9 @@ const {
     updateUserRole,
     deleteUserById
 } = require("./utils/users");
+const {
+    getAllProducts,
+} = require("./utils/products");
 const { getCurrentUser } = require("./auth/auth");
 
 /**
@@ -23,6 +26,7 @@ const { getCurrentUser } = require("./auth/auth");
 const allowedMethods = {
     "/api/register": ["POST"],
     "/api/users": ["GET"],
+    "/api/products": ["GET"]
 };
 
 /**
@@ -189,6 +193,14 @@ const handleRequest = async (request, response) => {
 
         const newUser = saveNewUser(body);
         return responseUtils.sendJson(response, newUser, 201);
+    }
+
+    if (filePath === "/api/products" && method.toUpperCase() === "GET") {
+        const currentUser = await getCurrentUser(request);
+
+        if (!currentUser) return responseUtils.basicAuthChallenge(response);
+
+        return responseUtils.sendJson(response, getAllProducts());
     }
 };
 

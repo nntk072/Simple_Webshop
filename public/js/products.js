@@ -2,6 +2,8 @@ const addToCart = (productId, productName) => {
   // TODO 9.2
   // you can use addProductToCart(), available already from /public/js/utils.js
   // for showing a notification of the product's creation, /public/js/utils.js  includes createNotification() function
+  const count = addProductToCart(productId);
+  return createNotification(`Added ${productName} to cart!`, 'notifications-container', false);
 };
 
 (async() => {
@@ -14,4 +16,33 @@ const addToCart = (productId, productName) => {
   //    * add product information to the template clone
   //    * remember to add an event listener for the button's 'click' event, and call addToCart() in the event listener's callback
   // - remember to add the products to the the page
+  const productsContainer = document.getElementById('products-container');
+  const productTemplate = document.getElementById('product-template');
+  const products = await getJSON('/api/products');
+  products.forEach(product => {
+    const productClone = productTemplate.content.cloneNode(true);
+
+    // Product assign
+    const name = productClone.querySelector('.product-name');
+    name.textContent = product.name;
+    name.id = `name-${product._id}`;
+
+    // Price assign
+    const price = productClone.querySelector('.product-price');
+    price.textContent = product.price;
+    price.id = `price-${product._id}`;
+
+    // Production assign
+    const description = productClone.querySelector('.product-description');
+    description.textContent = product.description;
+    description.id = `description-${product._id}`; 
+
+    const addToCartButton = productClone.querySelector('button');
+    addToCartButton.id = `add-to-cart-${product._id}`;
+    addToCartButton.addEventListener('click', () => {
+      addToCart(product._id, product.name);
+    });
+
+    productsContainer.appendChild(productClone);
+  });
 })();

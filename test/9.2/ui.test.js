@@ -5,6 +5,7 @@ const expect = chai.expect;
 const chaiHttp = require('chai-http');
 const { handleRequest } = require('../../routes');
 const { resetUsers } = require('../../utils/users');
+const { Console } = require('console');
 chai.use(chaiHttp);
 
 // helper function for creating randomized test data
@@ -646,13 +647,15 @@ describe('User Inteface', () => {
 
       notificationText = await page.$eval(notificationSelector, elem => elem.textContent.trim());
 
+      const expectedTextCombined = expectedText1 + expectedText2 + expectedText2;
+
       errorMsg =
         'Navigated to "/products.html" ' +
         `and clicked add product to shopping cart "${product2.name}". ` +
-        `Expected to receive a notification: "${expectedText2}" ` +
+        `Expected to receive a notification: "${expectedTextCombined}" ` +
         `but found this instead: "${notificationText}"`;
 
-      expect(notificationText).to.equal(expectedText1 + expectedText2 + expectedText2, errorMsg);
+      expect(notificationText).to.equal(expectedTextCombined, errorMsg);
 
       // Here start the cart page handling
       await page.goto(cartPage, { waitUntil: 'networkidle0' });

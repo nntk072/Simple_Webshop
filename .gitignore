@@ -85,6 +85,7 @@ jspm_packages/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.vscode
 
 # Sublime Text
 .sublime-workspace
