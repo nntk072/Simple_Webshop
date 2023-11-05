@@ -38,6 +38,7 @@ const placeOrder = async() => {
   productsInCart.forEach(product => {
     removeElement('cart-container', product.name);
   });
+  clearCart();
 };
 
 (async() => {
