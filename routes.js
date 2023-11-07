@@ -3,18 +3,11 @@
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
+const User = require("./models/user");
 const {
-    emailInUse,
-    getAllUsers,
-    saveNewUser,
     validateUser,
-    getUserById,
-    updateUserRole,
-    deleteUserById
 } = require("./utils/users");
-const {
-    getAllProducts,
-} = require("./utils/products");
+const { getAllProducts } = require("./utils/products");
 const { getCurrentUser } = require("./auth/auth");
 
 /**
@@ -26,7 +19,7 @@ const { getCurrentUser } = require("./auth/auth");
 const allowedMethods = {
     "/api/register": ["POST"],
     "/api/users": ["GET"],
-    "/api/products": ["GET"]
+    "/api/products": ["GET"],
 };
 
 /**
@@ -73,8 +66,8 @@ const matchUserId = (url) => {
 };
 
 const extractUserId = (url) => {
-    const parts = url.split('/');
-    return parts[parts.length - 1]; 
+    const parts = url.split("/");
+    return parts[parts.length - 1];
 };
 
 const handleRequest = async (request, response) => {
@@ -107,29 +100,32 @@ const handleRequest = async (request, response) => {
 
         if (method.toUpperCase() === "OPTIONS")
             return sendOptions(filePath, response);
-       
+
         const userId = extractUserId(filePath);
-        let user = getUserById(userId);
-        if (!user)
-            return responseUtils.notFound(response);
+        const user = await User.findById(userId).exec();
+        if (!user) return responseUtils.notFound(response);
 
         if (method.toUpperCase() === "GET")
             return responseUtils.sendJson(response, user);
 
-        if (method.toUpperCase() === "PUT"){
+        if (method.toUpperCase() === "PUT") {
             const json = await parseBodyJson(request);
             if (!json.role)
                 return responseUtils.badRequest(response, "Message");
             if (json.role !== "admin" && json.role !== "customer")
                 return responseUtils.badRequest(response, "message");
-            if (json.role === "admin")
-                user = updateUserRole(userId, "admin");
+            if (json.role === "admin") {
+                user.role = "admin";
+                await user.save();
+            }
             return responseUtils.sendJson(response, user);
         }
 
         if (method.toUpperCase() === "DELETE") {
-            if (currentUser.role === "admin")
-                user = deleteUserById(userId);
+            if (currentUser.role === "admin") {
+                user.deleteOne({});
+
+            }
             return responseUtils.sendJson(response, user);
         }
     }
@@ -162,12 +158,12 @@ const handleRequest = async (request, response) => {
             return responseUtils.forbidden(response);
         }
 
-        return responseUtils.sendJson(response, getAllUsers());
+        const users = await User.find({});
+        return responseUtils.sendJson(response, users);
     }
 
     // register new user
     if (filePath === "/api/register" && method.toUpperCase() === "POST") {
-        // Fail if not a JSON request, don't allow non-JSON Content-Type
         if (!isJson(request)) {
             return responseUtils.badRequest(
                 response,
@@ -187,11 +183,14 @@ const handleRequest = async (request, response) => {
         if (errors.length > 0) {
             return responseUtils.badRequest(response, errors);
         }
-        if (emailInUse(body.email)) {
+        const existingUser = await User.findOne({ email: body.email }).exec();
+        if (existingUser) {
             return responseUtils.badRequest(response, "Email already in use");
         }
 
-        const newUser = saveNewUser(body);
+        const newUser = new User(body);
+        newUser.role = "customer";
+        await newUser.save();
         return responseUtils.sendJson(response, newUser, 201);
     }
 

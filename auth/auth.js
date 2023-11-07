@@ -1,5 +1,6 @@
 const { getCredentials } = require("../utils/requestUtils");
 const { getUser } = require("../utils/users");
+const User = require("../models/user");
 
 /**
  * Get current user based on the request headers
@@ -15,9 +16,13 @@ const getCurrentUser = async (request) => {
 
     const credentials = getCredentials(request);
     if (!credentials || !credentials[0] || !credentials[1]) return null;
-    const user = await getUser(credentials[0], credentials[1]);
+    // const user = await getUser(credentials[0], credentials[1]);
+    const user = await User.findOne({ email: credentials[0]}).exec();
     if (!user) return null;
+    const passwordCorrect = await user.checkPassword(credentials[1]);
+    if (!passwordCorrect) return null;
     return user;
+    
 };
 
 module.exports = { getCurrentUser };
