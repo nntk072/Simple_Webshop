@@ -35,17 +35,27 @@ const resetUsers = () => {
  * @returns {string}
  */
 const generateId = () => {
-    let id;
+    // let id;
 
-    do {
-        // Generate unique random id that is not already in use
-        // Shamelessly borrowed from a Gist. See:
-        // https://gist.github.com/gordonbrander/2230317
+    // do {
+    //     // Generate unique random id that is not already in use
+    //     // Shamelessly borrowed from a Gist. See:
+    //     // https://gist.github.com/gordonbrander/2230317
 
-        id = Math.random().toString(36).substr(2, 9);
-    } while (data.users.some((u) => u._id === id));
-
-    return id;
+    //     id = Math.random().toString(36).substr(2, 9);
+    // } 
+    // while (data.users.some((u) => u._id === id));
+    // return id;
+    
+    const id = Math.random().toString(36).substr(2, 9);
+    
+    if (data.users.some((u) => u._id === id)) {
+        // If the generated ID is already in use, call the function recursively
+        return generateUniqueId();
+    } else {
+        // If the generated ID is unique, return it
+        return id;
+    }
 };
 
 /**
