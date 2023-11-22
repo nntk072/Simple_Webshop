@@ -1,4 +1,5 @@
 const responseUtils = require("../utils/responseUtils");
+const Product = require('../models/product');
 
 /**
  * Send all products as JSON
@@ -6,7 +7,7 @@ const responseUtils = require("../utils/responseUtils");
  * @param {http.ServerResponse} response
  */
 const getAllProducts = async response => {
-  data = require("../utils/products").getAllProducts();
+  const data = await Product.find({});
   return responseUtils.sendJson(response, data, 200);
 };
 
