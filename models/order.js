@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // This is copy-paste model from product
-// tests do not allow to export 1 more function, so here we replicate this model to make it subtype
+// EXCEPT: here is no image field. Because it is not rquired here
 const productSchema = new Schema({
     name: {
       type: String,
@@ -17,14 +17,6 @@ const productSchema = new Schema({
         required: true,
     },
 
-    image: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 1,
-        maxlength: 120
-    },
-
     description: {
         type: String,
         required: true,
@@ -34,17 +26,29 @@ const productSchema = new Schema({
     }
 })
 
-
-const orderSchema = new Schema({
+const orderInnerSchema = new Schema ({
     product: {
         type: productSchema,
         default: {},
         required: true
     },
-
+    
     quantity: {
         type: Number,
         required: true,
+    }
+})
+
+const orderSchema = new Schema({
+
+    customerId: {
+        type: String,
+        required: true
+    },
+
+    items: {
+        type: [orderInnerSchema],
+        default: undefined
     }
 })
 
