@@ -35,4 +35,4 @@ const productSchema = new Schema({
 productSchema.set('toJSON', { virtuals: false, versionKey: false });
 
 const Product = new mongoose.model('Product', productSchema);
-module.exports = {Product, productSchema};
+module.exports = Product;
