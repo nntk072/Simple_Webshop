@@ -1,21 +1,65 @@
+const Order = require("../models/order");
 const responseUtils = require("../utils/responseUtils");
-const Order = require('../models/order');
 
 /**
  * Send all orders as JSON
  *
  * @param {http.ServerResponse} response
  */
-const getAllOrdersForAdmin = async response => {
-  const adminOrders = await Order.find({});
-  return responseUtils.sendJson(response, adminOrders, 200);
+const getAllOrders = async (response) => {
+  const orders = await Order.find({});
+  return responseUtils.sendJson(response, orders);
 };
 
-const Order = require("../models/order");
-
-const getOrdersForCustomer = async (customerId) => {
+/**
+ * Retrieve orders for a specific customer by customerId and send them as JSON
+ *
+ * @param {http.ServerResponse} response
+ * @param {string} customerId ID of the customer to fetch orders for
+ */
+const getCustomerOrders = async (response, customerId) => {
   const customerOrders = await Order.find({ customerId });
-  return responseUtils.sendJson(response, customerOrders, 200);
+  return responseUtils.sendJson(response, customerOrders);
 };
 
-module.exports = { getAllOrdersForAdmin, getOrdersForCustomer };
+/**
+ * Retrieve an order by ID and send it as JSON
+ *
+ * @param {http.ServerResponse} response
+ * @param {string} orderId ID of the order to retrieve
+ * @param {Object} currentUser Current user object with role information
+ */
+const getOrderById = async (response, orderId, currentUser) => {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return responseUtils.notFound(response);
+    }
+
+    // Check if the current user is an admin or if the order belongs to the current user (customer)
+    if (currentUser.role === "admin" || order.customerId === currentUser._id) {
+      // Return the order if it belongs to the user or if the user is an admin
+      return responseUtils.sendJson(response, order);
+    } else {
+      // Unauthorized access for customer trying to access someone else's order
+      return responseUtils.notFound(response);
+    }
+};
+
+/**
+ * Create a new order and send it back as JSON
+ *
+ * @param {http.ServerResponse} response
+ * @param {Object} orderData JSON data from request body
+ */
+const createOrder = async (response, orderData) => {
+  const newOrder = await Order.create(orderData);
+  return responseUtils.sendJson(response, newOrder, 201);
+};
+
+module.exports = {
+  getAllOrders,
+  getCustomerOrders,
+  getOrderById,
+  createOrder,
+};

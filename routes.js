@@ -9,7 +9,7 @@ const {
 } = require("./utils/users");
 const { getAllProducts } = require("./utils/products");
 const { getCurrentUser } = require("./auth/auth");
-const { getAllOrdersForAdmin, getOrdersForCustomer } = require("./utils/orders");
+const { getAllOrders, getCustomerOrders, getOrderById } = require("./controllers/orders");
 
 /**
  * Known API routes and their allowed methods
@@ -223,20 +223,35 @@ const handleRequest = async (request, response) => {
 
     //GET all orders
     if (filePath === "/api/orders" && method.toUpperCase() === "GET") {
+        
+        const currentUser = await getCurrentUser(request);
+        if (!currentUser) 
+        return responseUtils.basicAuthChallenge(response);
+
+        let orders;
+
+        if (currentUser.role === "admin")
+            orders = await getAllOrders(response);
+
+        else if(currentUser.role === "customer")
+            orders = await getCustomerOrders(response, currentUser._id);
+
+        return responseUtils.sendJson(response, orders);
+    }
+
+    //GET single order with OrderID
+    if (matchIdRoute(filePath, "orders") && method.toUpperCase() === "GET") {
         const currentUser = await getCurrentUser(request);
 
         if (!currentUser) return responseUtils.basicAuthChallenge(response);
 
-        let orders;
+        const orderId = extractUserId(filePath); // Extract orderId from URL
 
-        if (currentUser.role === "admin") {
-            orders = await getAllOrdersForAdmin();
-        } 
-        // else {
-        //     orders = await getOrdersForCustomer(currentUser.id);
-        // }
+        let order = await getOrderById(response, orderId, currentUser);
 
-        return responseUtils.sendJson(response, orders);
+        if (!order) return responseUtils.notFound(response); 
+
+        return responseUtils.sendJson(response, order);
     }
 };
 
