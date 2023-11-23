@@ -9,7 +9,7 @@ const {
 } = require("./utils/users");
 const { getAllProducts } = require("./utils/products");
 const { getCurrentUser } = require("./auth/auth");
-const { getAllOrders, getCustomerOrders, getOrderById } = require("./controllers/orders");
+const { getAllOrders, getCustomerOrders, getOrderById, createNewOrder } = require("./controllers/orders");
 const Order = require("./models/order");
 
 /**
@@ -258,22 +258,43 @@ const handleRequest = async (request, response) => {
 
     //POST a new order
     if (filePath === "/api/orders" && method.toUpperCase() === "POST") {
-       
+        const currentUser = await getCurrentUser(request);
+        if (!currentUser) {
+            return responseUtils.basicAuthChallenge(response);
+        }
+
+        if (currentUser.role !== "customer") {
+            return responseUtils.forbidden(response);
+        }
+
         if (!isJson(request)) {
             return responseUtils.badRequest(
                 response,
                 "Invalid Content-Type. Expected application/json"
             );
         }
-        
-        const currentUser = await getCurrentUser(request);
-        if (!currentUser) 
-        return responseUtils.basicAuthChallenge(response);
 
-        const orderData = await parseBodyJson(request);     
+        const orderData = await parseBodyJson(request);
 
-        let newOrder = await createOrder(response, orderData);
-        return responseUtils.sendJson(response, newOrder, 201);
+        // Check for empty items array
+        if (!orderData.items || orderData.items.length === 0) {
+            return responseUtils.badRequest(response, "Items array is empty");
+        }
+
+        // Check for missing fields in each item of items array
+        if (!orderData.items.every(item =>
+            item.product &&
+            item.product._id &&
+            item.product.name &&
+            item.product.price !== undefined &&
+            item.quantity !== undefined
+            )) 
+            {
+            return responseUtils.badRequest(response, "Missing or invalid fields in items");
+        }      
+
+        const newOrder = await createNewOrder(orderData, currentUser._id); 
+        return responseUtils.sendJson(response, newOrder, 201);      
     }
 };
 

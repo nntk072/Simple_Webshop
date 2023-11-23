@@ -51,8 +51,9 @@ const getOrderById = async (response, orderId, currentUser) => {
  *
  * @param {http.ServerResponse} response
  * @param {Object} orderData JSON data from request body
+ * @param {string} customerId ID of the customer to place orders for
  */
-const createOrder = async (response, orderData) => {
+const createNewOrder = async (response, orderData, userId) => {
 
   // Check for empty items array
   if (!orderData.items || orderData.items.length === 0) {
@@ -71,7 +72,11 @@ const createOrder = async (response, orderData) => {
       return responseUtils.badRequest(response, "Missing or invalid fields in items");
   }
 
-  const newOrder = new Order(orderData);
+  const newOrder = new Order({
+    customerId: userId,
+    items: orderData.items 
+  });
+
   await newOrder.save();
   return responseUtils.sendJson(response, newOrder, 201);
 };
@@ -80,5 +85,5 @@ module.exports = {
   getAllOrders,
   getCustomerOrders,
   getOrderById,
-  createOrder,
+  createNewOrder,
 };
