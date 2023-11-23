@@ -10,6 +10,7 @@ const {
 const { getAllProducts } = require("./utils/products");
 const { getCurrentUser } = require("./auth/auth");
 const { getAllOrders, getCustomerOrders, getOrderById } = require("./controllers/orders");
+const Order = require("./models/order");
 
 /**
  * Known API routes and their allowed methods
@@ -240,10 +241,11 @@ const handleRequest = async (request, response) => {
     }
 
     //GET single order with OrderID
-    if (matchIdRoute(filePath, "orders") && method.toUpperCase() === "GET") {
+    if (filePath.startsWith("/api/orders/") && method.toUpperCase() === "GET") {
+        
         const currentUser = await getCurrentUser(request);
-
-        if (!currentUser) return responseUtils.basicAuthChallenge(response);
+        if (!currentUser) 
+            return responseUtils.basicAuthChallenge(response);
 
         const orderId = extractUserId(filePath); // Extract orderId from URL
 
@@ -252,6 +254,26 @@ const handleRequest = async (request, response) => {
         if (!order) return responseUtils.notFound(response); 
 
         return responseUtils.sendJson(response, order);
+    }
+
+    //POST a new order
+    if (filePath === "/api/orders" && method.toUpperCase() === "POST") {
+       
+        if (!isJson(request)) {
+            return responseUtils.badRequest(
+                response,
+                "Invalid Content-Type. Expected application/json"
+            );
+        }
+        
+        const currentUser = await getCurrentUser(request);
+        if (!currentUser) 
+        return responseUtils.basicAuthChallenge(response);
+
+        const orderData = await parseBodyJson(request);     
+
+        let newOrder = await createOrder(response, orderData);
+        return responseUtils.sendJson(response, newOrder, 201);
     }
 };
 

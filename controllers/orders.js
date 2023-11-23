@@ -53,7 +53,26 @@ const getOrderById = async (response, orderId, currentUser) => {
  * @param {Object} orderData JSON data from request body
  */
 const createOrder = async (response, orderData) => {
-  const newOrder = await Order.create(orderData);
+
+  // Check for empty items array
+  if (!orderData.items || orderData.items.length === 0) {
+    return responseUtils.badRequest(response, "Items array is empty");
+  }
+
+  // Check for missing fields in each item of items array
+  if (!orderData.items.every(item =>
+      item.product &&
+      item.product._id &&
+      item.product.name &&
+      item.product.price !== undefined &&
+      item.quantity !== undefined
+      )) 
+    {
+      return responseUtils.badRequest(response, "Missing or invalid fields in items");
+  }
+
+  const newOrder = new Order(orderData);
+  await newOrder.save();
   return responseUtils.sendJson(response, newOrder, 201);
 };
 
