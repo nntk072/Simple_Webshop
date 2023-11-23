@@ -105,8 +105,14 @@ const handleRequest = async (request, response) => {
         const user = await User.findById(userId).exec();
         if (!user) return responseUtils.notFound(response);
 
-        if (method.toUpperCase() === "GET")
+        if (method.toUpperCase() === "GET"){
+
+            if (!acceptsJson(request)) {
+                return responseUtils.contentTypeNotAcceptable(response);
+            }
+
             return responseUtils.sendJson(response, user);
+        }
 
         if (method.toUpperCase() === "PUT") {
             const json = await parseBodyJson(request);
