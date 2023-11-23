@@ -116,6 +116,11 @@ const handleRequest = async (request, response) => {
 
         if (method.toUpperCase() === "PUT") {
             const json = await parseBodyJson(request);
+
+            if (!acceptsJson(request)) {
+                return responseUtils.contentTypeNotAcceptable(response);
+            }
+            
             if (!json.role)
                 return responseUtils.badRequest(response, "Message");
             if (json.role !== "admin" && json.role !== "customer")
@@ -124,10 +129,16 @@ const handleRequest = async (request, response) => {
                 user.role = "admin";
                 await user.save();
             }
+            
             return responseUtils.sendJson(response, user);
         }
 
         if (method.toUpperCase() === "DELETE") {
+
+            if (!acceptsJson(request)) {
+                return responseUtils.contentTypeNotAcceptable(response);
+            }
+
             if (currentUser.role === "admin") {
                 user.deleteOne({});
 
