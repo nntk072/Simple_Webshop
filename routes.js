@@ -9,6 +9,7 @@ const {
 } = require("./utils/users");
 const { getAllProducts } = require("./utils/products");
 const { getCurrentUser } = require("./auth/auth");
+const { getAllOrdersForAdmin, getOrdersForCustomer } = require("./utils/orders");
 
 /**
  * Known API routes and their allowed methods
@@ -20,6 +21,7 @@ const allowedMethods = {
     "/api/register": ["POST"],
     "/api/users": ["GET"],
     "/api/products": ["GET"],
+    "/api/orders": ["GET"],
 };
 
 /**
@@ -217,6 +219,24 @@ const handleRequest = async (request, response) => {
         if (!currentUser) return responseUtils.basicAuthChallenge(response);
 
         return responseUtils.sendJson(response, getAllProducts());
+    }
+
+    //GET all orders
+    if (filePath === "/api/orders" && method.toUpperCase() === "GET") {
+        const currentUser = await getCurrentUser(request);
+
+        if (!currentUser) return responseUtils.basicAuthChallenge(response);
+
+        let orders;
+
+        if (currentUser.role === "admin") {
+            orders = await getAllOrdersForAdmin();
+        } 
+        // else {
+        //     orders = await getOrdersForCustomer(currentUser.id);
+        // }
+
+        return responseUtils.sendJson(response, orders);
     }
 };
 
