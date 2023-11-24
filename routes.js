@@ -22,8 +22,10 @@ const allowedMethods = {
     "/api/register": ["POST"],
     "/api/users": ["GET"],
     "/api/products": ["GET"],
-    "/api/orders": ["GET"],
+    "/api/orders": ["GET", "POST"],
 };
+
+allowedMethods["/api/orders/:orderId"] = ["GET"];
 
 /**
  * Send response to client options request.
