@@ -123,8 +123,7 @@ const getFullFilePath = fileName => {
 /**
  * Split file path into filename and extension
  * 
- * @param {string} fileName The file name
- * @param {string} ext The file extension
+ * @param {string} filePath The file path
  * @returns {string[]} The file name and extension
  */
 const splitPath = filePath => {
