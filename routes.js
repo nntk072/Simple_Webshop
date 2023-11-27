@@ -13,6 +13,8 @@ const { getAllProducts,
         deleteProductById,
         createProduct } = require("./controllers/products");
 const { getCurrentUser } = require("./auth/auth");
+const { getAllOrders, getCustomerOrders, getOrderById, createNewOrder } = require("./controllers/orders");
+const Order = require("./models/order");
 
 /**
  * Known API routes and their allowed methods
@@ -24,7 +26,10 @@ const allowedMethods = {
     "/api/register": ["POST"],
     "/api/users": ["GET"],
     "/api/products": ["GET", "POST"],
+    "/api/orders": ["GET", "POST"],
 };
+
+allowedMethods["/api/orders/:orderId"] = ["GET"];
 
 /**
  * Send response to client options request.
@@ -138,11 +143,22 @@ const handleRequest = async (request, response) => {
         const user = await User.findById(userId).exec();
         if (!user) return responseUtils.notFound(response);
 
-        if (method.toUpperCase() === "GET")
+        if (method.toUpperCase() === "GET"){
+
+            if (!acceptsJson(request)) {
+                return responseUtils.contentTypeNotAcceptable(response);
+            }
+
             return responseUtils.sendJson(response, user);
+        }
 
         if (method.toUpperCase() === "PUT") {
             const json = await parseBodyJson(request);
+
+            if (!acceptsJson(request)) {
+                return responseUtils.contentTypeNotAcceptable(response);
+            }
+            
             if (!json.role)
                 return responseUtils.badRequest(response, "Message");
             if (json.role !== "admin" && json.role !== "customer")
@@ -151,10 +167,16 @@ const handleRequest = async (request, response) => {
                 user.role = "admin";
                 await user.save();
             }
+            
             return responseUtils.sendJson(response, user);
         }
 
         if (method.toUpperCase() === "DELETE") {
+
+            if (!acceptsJson(request)) {
+                return responseUtils.contentTypeNotAcceptable(response);
+            }
+
             if (currentUser.role === "admin") {
                 user.deleteOne({});
             }
@@ -296,6 +318,81 @@ const handleRequest = async (request, response) => {
             }
             return deleteProductById(response, productId);
         }
+    }
+
+    //GET all orders
+    if (filePath === "/api/orders" && method.toUpperCase() === "GET") {
+        
+        const currentUser = await getCurrentUser(request);
+        if (!currentUser) 
+        return responseUtils.basicAuthChallenge(response);
+
+        let orders;
+
+        if (currentUser.role === "admin")
+            orders = await getAllOrders(response);
+
+        else if(currentUser.role === "customer")
+            orders = await getCustomerOrders(response, currentUser._id);
+
+        return responseUtils.sendJson(response, orders);
+    }
+
+    //GET single order with OrderID
+    if (filePath.startsWith("/api/orders/") && method.toUpperCase() === "GET") {
+        
+        const currentUser = await getCurrentUser(request);
+        if (!currentUser) 
+            return responseUtils.basicAuthChallenge(response);
+
+        const orderId = extractUserId(filePath); // Extract orderId from URL
+
+        let order = await getOrderById(response, orderId, currentUser);
+
+        if (!order) return responseUtils.notFound(response); 
+
+        return responseUtils.sendJson(response, order);
+    }
+
+    //POST a new order
+    if (filePath === "/api/orders" && method.toUpperCase() === "POST") {
+        const currentUser = await getCurrentUser(request);
+        if (!currentUser) {
+            return responseUtils.basicAuthChallenge(response);
+        }
+
+        if (currentUser.role !== "customer") {
+            return responseUtils.forbidden(response);
+        }
+
+        if (!isJson(request)) {
+            return responseUtils.badRequest(
+                response,
+                "Invalid Content-Type. Expected application/json"
+            );
+        }
+
+        const orderData = await parseBodyJson(request);
+
+        // Check for empty items array
+        if (!orderData.items || orderData.items.length === 0) {
+            return responseUtils.badRequest(response, "Items array is empty");
+        }
+
+        // Check for missing fields in each item of items array
+        if (!orderData.items.every(item =>
+            item.product &&
+            item.product._id &&
+            item.product.name &&
+            item.product.price !== undefined &&
+            item.quantity !== undefined
+            )) 
+            {
+            return responseUtils.badRequest(response, "Missing or invalid fields in items");
+        }      
+
+        const newOrder = await createNewOrder(orderData, currentUser._id); 
+        return responseUtils.sendJson(response, newOrder, 201);      
     }
 };
 

@@ -30,7 +30,7 @@ const deleteUser = async(response, userId, currentUser) => {
     return responseUtils.notFound(response);
   }
   await User.deleteOne({_id: user._id});
-  return responseUtils.sendJson(response, user, 200);
+  return responseUtils.sendJson(response, user, 200, "Deleted user Customer");
 };
 
 /**
