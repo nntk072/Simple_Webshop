@@ -14,7 +14,6 @@
  *   getJSON("/api/users").then(json => {
  *     // Do something with the json
  *   })
- *
  * @param {string} url resource url on the server
  * @returns {Promise<*>} promise that resolves to the parsed JSON
  */
@@ -29,13 +28,12 @@ const getJSON = async url => {
  *
  * Uses fetch to send data as JSON to the server and returns the response as JSON.
  * Again remember that async function always returns a Promise.
- *
  * @param {string} url resource url on the server
  * @param {string} method "PUT" or "POST"
- * @param {Object|Array} data payload data to be sent to the server as JSON
+ * @param {object|Array} data payload data to be sent to the server as JSON
  * @returns {Promise<*>} promise that resolves to the parsed JSON
  */
-const postOrPutJSON = async(url, method, data = {}) => {
+const postOrPutJSON = async (url, method, data = {}) => {
   method = method.toUpperCase();
   if (method !== 'POST' && method !== 'PUT') {
     throw 'Invalid method! Valid methods are POST and PUT!';
@@ -61,16 +59,14 @@ const postOrPutJSON = async(url, method, data = {}) => {
 
 /**
  * Asynchronously remove a resource from the server (DELETE)
- *
  * Uses fetch to send the request to the server and returns the response as JSON.
  * Again remember that async function always returns a Promise.
- *
  * @param {string} url resource url on the server
  * @returns {Promise<*>} promise that resolves to the parsed JSON
  */
 const deleteResource = async url => {
   const response = await fetch(url, {
-    method : 'DELETE',
+    method: 'DELETE',
     credentials: 'same-origin',
     headers: {
       Accept: 'application/json',
@@ -89,8 +85,7 @@ const deleteResource = async url => {
  * Generate random unique id to use as id value on notifications
  * or other HTML elements (remember that IDs must be unique within
  * a document).
- *
- * @returns {string}
+ * @returns {string} unique id
  */
 const generateId = () => {
   // Shamelessly borrowed from a Gist. See:
@@ -98,8 +93,8 @@ const generateId = () => {
   return (
     '_' +
     Math.random()
-    .toString(36)
-    .substr(2, 9)
+      .toString(36)
+      .substr(2, 9)
   );
 };
 
@@ -108,10 +103,10 @@ const generateId = () => {
  *
  * Appends a new paragraph inside the container element and gives it
  * class based on the status of the message (success or failure).
- *
- * @param {string} message
+ * @param {string} message message to be displayed
  * @param {string} containerId id attribute of the container element
  * @param {boolean} isSuccess whether the message describes a success or a failure
+ * @returns {void} nothing
  */
 const createNotification = (message, containerId, isSuccess = true) => {
   const container = document.getElementById(containerId);
@@ -138,7 +133,6 @@ const createNotification = (message, containerId, isSuccess = true) => {
 
 /**
  * Remove an element (and its descendants) from the DOM.
- *
  * @param {string} containerId containing element's id
  * @param {string} elementId id of the element to be removed
  */
@@ -147,6 +141,11 @@ const removeElement = (containerId, elementId) => {
   container.querySelectorAll(`#${elementId}`).forEach(element => element.remove());
 };
 
+/**
+ * Remove all elements (and their descendants) from the DOM.
+ * @param {string} productId function to be called when the button is clicked
+ * @returns {HTMLElement} button element
+ */
 const addProductToCart = productId => {
   const productCount = getProductCountFromCart(productId);
   // TODO 9.2
@@ -164,6 +163,11 @@ const addProductToCart = productId => {
   return newCount;
 };
 
+/**
+ * Remove one product from the cart.
+ * @param {string} productId function to be called when the button is clicked
+ * @returns {HTMLElement} button element
+ */
 const decreaseProductCount = productId => {
   const productCount = getProductCountFromCart(productId);
   if (productCount > 1) {
@@ -187,6 +191,11 @@ const decreaseProductCount = productId => {
   }
 };
 
+/** 
+ * Returns the amount of products in the cart.
+ * @param {string} productId function to be called when the button is clicked
+ * @returns {number} amount of products in the cart
+ */
 const getProductCountFromCart = productId => {
   // TODO 9.2
   // use sessionStorage's getItem('key') to to fetch and
@@ -201,6 +210,10 @@ const getProductCountFromCart = productId => {
   return item === null ? 0 : +item;
 };
 
+/**
+ * Returns all products in the cart.
+ * @returns {HTMLElement} button element
+ */
 const getAllProductsFromCart = () => {
   return Object.keys(sessionStorage).reduce((array, str) => {
     const item = {
@@ -211,6 +224,9 @@ const getAllProductsFromCart = () => {
   }, []);
 };
 
+/**
+ * Returns all products in the cart.
+ */
 const clearCart = () => {
   // TODO 9.2
   // use sessionStorage's clear() to remove 

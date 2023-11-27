@@ -1,5 +1,3 @@
-/* eslint-disable complexity */
-/* eslint-disable max-lines-per-function */
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
@@ -15,6 +13,7 @@ const { getAllProducts,
 const { getCurrentUser } = require("./auth/auth");
 const { getAllOrders, getCustomerOrders, getOrderById, createNewOrder } = require("./controllers/orders");
 const Order = require("./models/order");
+const http = require("http");
 
 /**
  * Known API routes and their allowed methods
@@ -33,9 +32,9 @@ allowedMethods["/api/orders/:orderId"] = ["GET"];
 
 /**
  * Send response to client options request.
- *
  * @param {string} filePath pathname of the request URL
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response The server response object
+ * @returns {Promise<void>} Promise resolved when response has been sent
  */
 const sendOptions = (filePath, response) => {
     if (filePath in allowedMethods) {
@@ -53,10 +52,9 @@ const sendOptions = (filePath, response) => {
 
 /**
  * Does the url have an ID component as its last part? (e.g. /api/users/dsf7844e)
- *
  * @param {string} url filePath
- * @param {string} prefix
- * @returns {boolean}
+ * @param {string} prefix filePath prefix
+ * @returns {boolean} true if matches, false otherwise
  */
 const matchIdRoute = (url, prefix) => {
     const idPattern = "[0-9a-z]{8,24}";
@@ -66,9 +64,8 @@ const matchIdRoute = (url, prefix) => {
 
 /**
  * Does the URL match /api/users/{id}
- *
  * @param {string} url filePath
- * @returns {boolean}
+ * @returns {boolean} true if matches, false otherwise
  */
 const matchUserId = (url) => {
     return matchIdRoute(url, "users");
@@ -76,19 +73,28 @@ const matchUserId = (url) => {
 
 /**
  * Does the URL match /api/products/{id}
- *
  * @param {string} url filePath
- * @returns {boolean}
+ * @returns {boolean} true if matches, false otherwise
  */
 const matchProductsId = (url) => {
     return matchIdRoute(url, "products");
 };
 
+/**
+ * Does the URL match /api/orders/{id}
+ * @param {string} url filePath
+ * @returns {boolean} true if matches, false otherwise
+ */
 const extractUserId = (url) => {
     const parts = url.split("/");
     return parts[parts.length - 1];
 };
 
+/**
+ * Does the URL match /api/orders/{id}
+ * @param {string} url filePath
+ * @returns {boolean} true if matches, false otherwise
+ */
 function IsExistingPath(url) {
     if (matchUserId(url)){
         return true;
@@ -103,13 +109,24 @@ function IsExistingPath(url) {
     return false;
 }
 
+/**
+ * @param {string} url filePath
+ * @param {string} method HTTP method
+ * @returns {boolean} true if matches, false otherwise
+ */
 function IsAllowedMethod(url, method) {
     if (matchUserId(url) || matchProductsId(url)) {
         return true;
     }
-    return allowedMethods[url].includes(method.toUpperCase())
+    return allowedMethods[url].includes(method.toUpperCase());
 }
 
+/**
+ * Handle incoming HTTP request
+ * @param {http.IncomingMessage} request request object
+ * @param {http.ServerResponse} response response object
+ * @returns {Promise<void>} Promise resolved when response has been sent
+ */
 const handleRequest = async (request, response) => {
     const { url, method, headers } = request;
     const filePath = new URL(url, `http://${headers.host}`).pathname;
@@ -347,7 +364,7 @@ const handleRequest = async (request, response) => {
 
         const orderId = extractUserId(filePath); // Extract orderId from URL
 
-        let order = await getOrderById(response, orderId, currentUser);
+        const order = await getOrderById(response, orderId, currentUser);
 
         if (!order) return responseUtils.notFound(response); 
 

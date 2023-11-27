@@ -1,14 +1,14 @@
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 
 const NOT_FOUND_TEMPLATE = path.resolve(__dirname, '../public/404.html');
 
 /**
  * Render file from ./public directory (calls response.end())
- *
- * @param {string} filePath
- * @param {http.ServerResponse} response
- * @returns {void}
+ * @param {string} filePath The path to the file to render
+ * @param {http.ServerResponse} response The response object
+ * @returns {void} Nothing
  */
 const renderPublic = (filePath, response) => {
   if (!filePath) return renderNotFound(response);
@@ -23,9 +23,8 @@ const renderPublic = (filePath, response) => {
 
 /**
  * Render ../views/404.html (calls response.end())
- *
- * @param {http.ServerResponse} response
- * @returns {void}
+ * @param {http.ServerResponse} response Response object
+ * @returns {void} Nothing
  */
 const renderNotFound = response => {
   renderFile(NOT_FOUND_TEMPLATE, getContentType('html'), response);
@@ -33,8 +32,7 @@ const renderNotFound = response => {
 
 /**
  * Get Content-Type based on file extension
- *
- * @param {string} fileExtension
+ * @param {string} fileExtension File extension
  * @returns {string} contentType
  */
 const getContentType = fileExtension => {
@@ -69,6 +67,12 @@ const getContentType = fileExtension => {
   return contentType;
 };
 
+/**
+ * @param {string} filePath The path to the file to render
+ * @param {string} contentType The content type of the file
+ * @param {http.ServerResponse} response The response object
+ * @returns {void} Nothing
+ */
 const renderFile = (filePath, contentType, response) => {
   fs.readFile(filePath, (error, content) => {
     if (error) {

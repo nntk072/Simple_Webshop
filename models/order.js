@@ -24,7 +24,7 @@ const productSchema = new Schema({
         minlength: 1,
         maxlength: 400
     }
-})
+});
 
 const orderInnerSchema = new Schema ({
     product: {
@@ -37,7 +37,7 @@ const orderInnerSchema = new Schema ({
         type: Number,
         required: true,
     }
-})
+});
 
 const orderSchema = new Schema({
 
@@ -50,7 +50,7 @@ const orderSchema = new Schema({
         type: [orderInnerSchema],
         default: undefined
     }
-})
+});
 
 orderSchema.set('toJSON', { virtuals: false, versionKey: false });
 

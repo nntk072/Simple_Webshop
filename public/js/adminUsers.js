@@ -1,7 +1,7 @@
 /**
  * Functions for modifying and deleting users.
+ * @returns {Promise<void>} Promise resolved when users have been fetched and rendered
  */
-
 (async() => {
   const baseContainer = document.querySelector('#users-container');
   const modifyContainer = document.querySelector('#modify-user');

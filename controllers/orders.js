@@ -1,10 +1,10 @@
 const Order = require("../models/order");
 const responseUtils = require("../utils/responseUtils");
-
+const http = require("http");
 /**
  * Send all orders as JSON
- *
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response Response object to send the JSON to
+ * @returns {Promise<void>} Promise resolved when orders have been sent
  */
 const getAllOrders = async (response) => {
   const orders = await Order.find({});
@@ -13,9 +13,9 @@ const getAllOrders = async (response) => {
 
 /**
  * Retrieve orders for a specific customer by customerId and send them as JSON
- *
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response Response object to send the JSON to
  * @param {string} customerId ID of the customer to fetch orders for
+ * @returns {Promise<void>} Promise resolved when orders have been sent
  */
 const getCustomerOrders = async (response, customerId) => {
   const customerOrders = await Order.find({ customerId });
@@ -24,10 +24,10 @@ const getCustomerOrders = async (response, customerId) => {
 
 /**
  * Retrieve an order by ID and send it as JSON
- *
- * @param {http.ServerResponse} response
+ * @param {http.ServerResponse} response Response object to send the JSON to
  * @param {string} orderId ID of the order to retrieve
- * @param {Object} currentUser Current user object with role information
+ * @param {object} currentUser Current user object with role information
+ * @returns {Promise<void>} Promise resolved when order has been sent
  */
 const getOrderById = async (response, orderId, currentUser) => {
     const order = await Order.findById(orderId);
@@ -48,10 +48,10 @@ const getOrderById = async (response, orderId, currentUser) => {
 
 /**
  * Create a new order and send it back as JSON
- *
- * @param {http.ServerResponse} response
- * @param {Object} orderData JSON data from request body
- * @param {string} customerId ID of the customer to place orders for
+ * @param {http.ServerResponse} response The response object to send the JSON to
+ * @param {object} orderData JSON data from request body
+ * @param {string} userId ID of the user to place orders for
+ * @returns {Promise<void>} Promise resolved when order has been created and sent
  */
 const createNewOrder = async (response, orderData, userId) => {
 

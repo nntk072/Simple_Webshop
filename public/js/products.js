@@ -1,3 +1,8 @@
+/**
+ * @param {string} productId The product ID to add to the cart
+ * @param {string} productName The product name to show in the notification
+ * @returns {HTMLElement} button element
+ */
 const addToCart = (productId, productName) => {
   // TODO 9.2
   // you can use addProductToCart(), available already from /public/js/utils.js
@@ -5,8 +10,7 @@ const addToCart = (productId, productName) => {
   const count = addProductToCart(productId);
   return createNotification(`Added ${productName} to cart!`, 'notifications-container', false);
 };
-
-(async() => {
+(async () => {
   //TODO 9.2 
   // - get the 'products-container' element from the /products.html
   // - get the 'product-template' element from the /products.html
@@ -35,7 +39,7 @@ const addToCart = (productId, productName) => {
     // Production assign
     const description = productClone.querySelector('.product-description');
     description.textContent = product.description;
-    description.id = `description-${product._id}`; 
+    description.id = `description-${product._id}`;
 
     const addToCartButton = productClone.querySelector('button');
     addToCartButton.id = `add-to-cart-${product._id}`;
