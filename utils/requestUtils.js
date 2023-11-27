@@ -93,7 +93,18 @@ const parseBodyJson = (request) => {
         });
 
         request.on("end", () => {
-            resolve(JSON.parse(body));
+            try {
+                const jsonData = JSON.parse(body);
+        
+                // Check if the parsed data is valid JSON
+                if (jsonData && typeof jsonData === "object") {
+                  resolve(jsonData);
+                } else {
+                  reject(new Error("Invalid JSON received"));
+                }
+            } catch (error) {
+                reject(new Error("Invalid JSON received"));
+            }
         });
     });
 };
