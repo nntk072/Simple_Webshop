@@ -20,7 +20,7 @@ const getAllProducts = async response => {
  * @returns {Promise<void>} Promise resolved when products have been sent
  */
 const getProductById = async (response, productId) => {
-  const data =  await Product.findById(productId).exec();
+  const data = await Product.findById(productId).exec();
   if (!data) {
     return responseUtils.notFound(response);
   }
@@ -36,7 +36,7 @@ const getProductById = async (response, productId) => {
  * @returns {Promise<void>} Promise resolved when products have been sent
  */
 const updateProductById = async (response, productId, newData) => {
-  const data =  await Product.findById(productId).exec();
+  const data = await Product.findById(productId).exec();
   if (!data) {
     return responseUtils.notFound(response);
   }

@@ -1,3 +1,5 @@
+/* eslint-disable complexity */
+/* eslint-disable max-lines-per-function */
 const responseUtils = require("./utils/responseUtils");
 const { acceptsJson, isJson, parseBodyJson } = require("./utils/requestUtils");
 const { renderPublic } = require("./utils/render");
@@ -421,5 +423,4 @@ const handleRequest = async (request, response) => {
         return responseUtils.sendJson(response, newOrder, 201);      
     }
 };
-
 module.exports = { handleRequest };
