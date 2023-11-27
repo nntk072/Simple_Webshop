@@ -5,6 +5,7 @@ const http = require("http");
 
 /**
  * Send all users as JSON
+ * 
  * @param {http.ServerResponse} response The server response object
  * @returns {Promise<void>} Promise resolved when users have been sent
  */
@@ -15,6 +16,7 @@ const getAllUsers = async response => {
 
 /**
  * Delete user and send deleted user as JSON
+ * 
  * @param {http.ServerResponse} response The server response object
  * @param {string} userId The user ID to delete
  * @param {object} currentUser (mongoose document object)
@@ -34,6 +36,7 @@ const deleteUser = async (response, userId, currentUser) => {
 
 /**
  * Update user and send updated user as JSON
+ * 
  * @param {http.ServerResponse} response The server response object
  * @param {string} userId User ID to update
  * @param {object} currentUser (mongoose document object)
@@ -64,6 +67,7 @@ const updateUser = async (response, userId, currentUser, userData) => {
 
 /**
  * Send user data as JSON
+ * 
  * @param {http.ServerResponse} response response object to send the JSON to
  * @param {string} userId user ID to retrieve
  * @param {object} currentUser (mongoose document object)
@@ -79,6 +83,7 @@ const viewUser = async (response, userId, currentUser) => {
 
 /**
  * Register new user and send created user back as JSON
+ * 
  * @param {http.ServerResponse} response The server response object
  * @param {object} userData JSON data from request body
  * @returns {Promise<void>} Promise resolved when user has been created

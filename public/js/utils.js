@@ -14,6 +14,7 @@
  *   getJSON("/api/users").then(json => {
  *     // Do something with the json
  *   })
+ * 
  * @param {string} url resource url on the server
  * @returns {Promise<*>} promise that resolves to the parsed JSON
  */
@@ -28,6 +29,7 @@ const getJSON = async url => {
  *
  * Uses fetch to send data as JSON to the server and returns the response as JSON.
  * Again remember that async function always returns a Promise.
+ * 
  * @param {string} url resource url on the server
  * @param {string} method "PUT" or "POST"
  * @param {object|Array} data payload data to be sent to the server as JSON
@@ -61,6 +63,7 @@ const postOrPutJSON = async (url, method, data = {}) => {
  * Asynchronously remove a resource from the server (DELETE)
  * Uses fetch to send the request to the server and returns the response as JSON.
  * Again remember that async function always returns a Promise.
+ * 
  * @param {string} url resource url on the server
  * @returns {Promise<*>} promise that resolves to the parsed JSON
  */
@@ -85,6 +88,7 @@ const deleteResource = async url => {
  * Generate random unique id to use as id value on notifications
  * or other HTML elements (remember that IDs must be unique within
  * a document).
+ * 
  * @returns {string} unique id
  */
 const generateId = () => {
@@ -103,6 +107,7 @@ const generateId = () => {
  *
  * Appends a new paragraph inside the container element and gives it
  * class based on the status of the message (success or failure).
+ * 
  * @param {string} message message to be displayed
  * @param {string} containerId id attribute of the container element
  * @param {boolean} isSuccess whether the message describes a success or a failure
@@ -133,6 +138,7 @@ const createNotification = (message, containerId, isSuccess = true) => {
 
 /**
  * Remove an element (and its descendants) from the DOM.
+ * 
  * @param {string} containerId containing element's id
  * @param {string} elementId id of the element to be removed
  */
@@ -143,6 +149,7 @@ const removeElement = (containerId, elementId) => {
 
 /**
  * Remove all elements (and their descendants) from the DOM.
+ * 
  * @param {string} productId function to be called when the button is clicked
  * @returns {HTMLElement} button element
  */
@@ -165,6 +172,7 @@ const addProductToCart = productId => {
 
 /**
  * Remove one product from the cart.
+ * 
  * @param {string} productId function to be called when the button is clicked
  * @returns {HTMLElement} button element
  */
@@ -193,6 +201,7 @@ const decreaseProductCount = productId => {
 
 /** 
  * Returns the amount of products in the cart.
+ * 
  * @param {string} productId function to be called when the button is clicked
  * @returns {number} amount of products in the cart
  */
@@ -212,6 +221,7 @@ const getProductCountFromCart = productId => {
 
 /**
  * Returns all products in the cart.
+ * 
  * @returns {HTMLElement} button element
  */
 const getAllProductsFromCart = () => {

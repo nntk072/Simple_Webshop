@@ -5,6 +5,7 @@ const http = require("http");
 
 /**
  * Get current user based on the request headers
+ * 
  * @param {http.IncomingMessage} request the request object
  * @returns {object|null} current authenticated user or null if not yet authenticated
  */

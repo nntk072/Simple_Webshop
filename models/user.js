@@ -91,6 +91,7 @@ const userSchema = new Schema({
 
 /**
  * Compare supplied password with user's own (hashed) password
+ * 
  * @param {string} password The password to compare
  * @returns {Promise<boolean>} promise that resolves to the comparison result
  */

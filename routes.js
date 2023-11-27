@@ -32,6 +32,7 @@ allowedMethods["/api/orders/:orderId"] = ["GET"];
 
 /**
  * Send response to client options request.
+ * 
  * @param {string} filePath pathname of the request URL
  * @param {http.ServerResponse} response The server response object
  * @returns {Promise<void>} Promise resolved when response has been sent
@@ -52,6 +53,7 @@ const sendOptions = (filePath, response) => {
 
 /**
  * Does the url have an ID component as its last part? (e.g. /api/users/dsf7844e)
+ * 
  * @param {string} url filePath
  * @param {string} prefix filePath prefix
  * @returns {boolean} true if matches, false otherwise
@@ -64,6 +66,7 @@ const matchIdRoute = (url, prefix) => {
 
 /**
  * Does the URL match /api/users/{id}
+ * 
  * @param {string} url filePath
  * @returns {boolean} true if matches, false otherwise
  */
@@ -73,6 +76,7 @@ const matchUserId = (url) => {
 
 /**
  * Does the URL match /api/products/{id}
+ * 
  * @param {string} url filePath
  * @returns {boolean} true if matches, false otherwise
  */
@@ -82,6 +86,7 @@ const matchProductsId = (url) => {
 
 /**
  * Does the URL match /api/orders/{id}
+ * 
  * @param {string} url filePath
  * @returns {boolean} true if matches, false otherwise
  */
@@ -92,6 +97,7 @@ const extractUserId = (url) => {
 
 /**
  * Does the URL match /api/orders/{id}
+ * 
  * @param {string} url filePath
  * @returns {boolean} true if matches, false otherwise
  */
@@ -110,6 +116,8 @@ function IsExistingPath(url) {
 }
 
 /**
+ * Checks if the method is allowed for the given URL
+ * 
  * @param {string} url filePath
  * @param {string} method HTTP method
  * @returns {boolean} true if matches, false otherwise
@@ -123,6 +131,7 @@ function IsAllowedMethod(url, method) {
 
 /**
  * Handle incoming HTTP request
+ * 
  * @param {http.IncomingMessage} request request object
  * @param {http.ServerResponse} response response object
  * @returns {Promise<void>} Promise resolved when response has been sent

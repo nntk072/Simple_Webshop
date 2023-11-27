@@ -32,6 +32,7 @@ const resetUsers = () => {
 
 /**
  * Generate a random string for use as user ID
+ * 
  * @returns {string} random string
  */
 const generateId = () => {
@@ -60,6 +61,7 @@ const generateId = () => {
 
 /**
  * Check if email is already in use by another user
+ * 
  * @param {string} email The email to check
  * @returns {boolean} True if email is already in use, false otherwise
  */
@@ -70,6 +72,7 @@ const emailInUse = (email) => data.users.some((user) => user.email === email);
  *
  * Returns a copy of the found user and not the original
  * to prevent modifying the user outside of this module.
+ * 
  * @param {string} email The email to check
  * @param {string} password The password to check
  * @returns {object|undefined} user object or undefined if user not found
@@ -86,6 +89,7 @@ const getUser = (email, password) => {
  * 
  * Returns a copy of the user and not the original
  * to prevent modifying the user outside of this module.
+ * 
  * @param {string} userId The user ID to check
  * @returns {object|undefined} The user object or undefined if user not found
  */
@@ -97,6 +101,7 @@ const getUserById = (userId) => {
 
 /**
  * Delete user by its ID and return the deleted user
+ * 
  * @param {string} userId The user ID to check
  * @returns {object|undefined} deleted user or undefined if user does not exist
  */
@@ -116,6 +121,7 @@ const deleteUserById = (userId) => {
  *
  * Returns copies of the users and not the originals
  * to prevent modifying them outside of this module.
+ * 
  * @returns {Array<object>} Array of user objects
  */
 const getAllUsers = () => data.users.map((user) => ({ ...user }));
@@ -128,6 +134,7 @@ const getAllUsers = () => data.users.map((user) => ({ ...user }));
  * to prevent modifying the user outside this module.
  *
  * DO NOT MODIFY OR OVERWRITE users.json
+ * 
  * @param {object} user object containing at least name, email and password
  * @returns {object} copy of the created user
  */
@@ -148,6 +155,7 @@ const saveNewUser = (user) => {
  *
  * Returns a copy of the user and not the original
  * to prevent modifying the user outside of this module.
+ * 
  * @param {string} userId The user ID to check
  * @param {string} role "customer" or "admin"
  * @returns {object|undefined} copy of the updated user or undefined if user does not exist
@@ -169,6 +177,7 @@ const updateUserRole = (userId, role) => {
  *
  * This function can be used to validate that user has all required
  * fields before saving it.
+ * 
  * @param {object} user user object to be validated
  * @returns {Array<string>} Array of error messages or empty array if user is valid.
  */

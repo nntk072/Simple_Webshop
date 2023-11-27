@@ -6,6 +6,7 @@ require('dotenv').config();
  * Returns the MongoDB connection URL from DBURL environment variable,
  * or if the environment variable is not defined, return the default URL
  * mongodb://localhost:27017/WebShopDb
+ * 
  * @returns {string} connection URL
  */
 const getDbUrl = () => {
@@ -45,6 +46,7 @@ function connectDB() {
 
 /**
  * Create a new index in database
+ * 
  * @param {object} err Error object
  */
 function handleCriticalError(err) {

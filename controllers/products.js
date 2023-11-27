@@ -3,6 +3,7 @@ const Product = require('../models/product');
 const http = require("http");
 /**
  * Send all products as JSON
+ * 
  * @param {http.ServerResponse} response The response object to send the JSON to
  * @returns {Promise<void>} Promise resolved when products have been sent
  */
@@ -13,6 +14,7 @@ const getAllProducts = async response => {
 
 /**
  * Send all products as JSON
+ * 
  * @param {http.ServerResponse} response The response object to send the JSON to
  * @param {string} productId ID of the product to retrieve
  * @returns {Promise<void>} Promise resolved when products have been sent
@@ -27,6 +29,7 @@ const getProductById = async (response, productId) => {
 
 /**
  * Send all products as JSON
+ * 
  * @param {http.ServerResponse} response The response object to send the JSON to
  * @param {string} productId ID of the product to retrieve
  * @param {object} newData JSON data from request body
@@ -59,6 +62,7 @@ const updateProductById = async (response, productId, newData) => {
 
 /**
  * Updates a product by ID
+ * 
  * @param {http.ServerResponse} response The response object to send the JSON to
  * @param {string} productId ID of the product to update
  * @returns {Promise<void>} Promise resolved when product has been updated and sent
@@ -74,6 +78,7 @@ const deleteProductById = async (response, productId) => {
 
 /**
  * Delete a product by ID
+ * 
  * @param {http.ServerResponse} response The response object to send the JSON to
  * @param {object} productData JSON data from request body
  * @returns {Promise<void>} Promise resolved when product has been created and sent

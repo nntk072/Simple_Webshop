@@ -6,6 +6,7 @@ const NOT_FOUND_TEMPLATE = path.resolve(__dirname, '../public/404.html');
 
 /**
  * Render file from ./public directory (calls response.end())
+ * 
  * @param {string} filePath The path to the file to render
  * @param {http.ServerResponse} response The response object
  * @returns {void} Nothing
@@ -23,6 +24,7 @@ const renderPublic = (filePath, response) => {
 
 /**
  * Render ../views/404.html (calls response.end())
+ * 
  * @param {http.ServerResponse} response Response object
  * @returns {void} Nothing
  */
@@ -32,6 +34,7 @@ const renderNotFound = response => {
 
 /**
  * Get Content-Type based on file extension
+ * 
  * @param {string} fileExtension File extension
  * @returns {string} contentType
  */
@@ -68,6 +71,8 @@ const getContentType = fileExtension => {
 };
 
 /**
+ * render file from ./public directory (calls response.end())
+ * 
  * @param {string} filePath The path to the file to render
  * @param {string} contentType The content type of the file
  * @param {http.ServerResponse} response The response object
@@ -101,6 +106,12 @@ const renderFile = (filePath, contentType, response) => {
   });
 };
 
+/**
+ * Get full file path
+ * 
+ * @param {string} fileName The file name
+ * @returns {string} The full file path
+ */
 const getFullFilePath = fileName => {
   const basePath = 'public';
   return path.resolve(
@@ -109,6 +120,13 @@ const getFullFilePath = fileName => {
   );
 };
 
+/**
+ * Split file path into filename and extension
+ * 
+ * @param {string} fileName The file name
+ * @param {string} ext The file extension
+ * @returns {string[]} The file name and extension
+ */
 const splitPath = filePath => {
   const tmpPath = filePath.split('?')[0];
   const filename = path.basename(tmpPath);
