@@ -30,7 +30,7 @@ const productSchema = new Schema({
         minlength: 1,
         maxlength: 400
     }
-})
+});
 
 productSchema.set('toJSON', { virtuals: false, versionKey: false });
 
