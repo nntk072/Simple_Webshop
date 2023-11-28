@@ -375,7 +375,8 @@ const handleRequest = async (request, response) => {
         else if(currentUser.role === "customer")
             orders = await getCustomerOrders(response, currentUser._id);
 
-        return responseUtils.sendJson(response, orders);
+        // return responseUtils.sendJson(response, orders);
+        return orders;
     }
 
     //GET single order with OrderID
