@@ -11,7 +11,10 @@ const { getAllProducts,
         deleteProductById,
         createProduct } = require("./controllers/products");
 const { getCurrentUser } = require("./auth/auth");
-const { getAllOrders, getCustomerOrders, getOrderById, createNewOrder } = require("./controllers/orders");
+const { getAllOrders, 
+    getCustomerOrders, 
+    getOrderById, 
+    createNewOrder } = require("./controllers/orders");
 const Order = require("./models/order");
 const http = require("http");
 
@@ -27,8 +30,6 @@ const allowedMethods = {
     "/api/products": ["GET", "POST"],
     "/api/orders": ["GET", "POST"],
 };
-
-allowedMethods["/api/orders/:orderId"] = ["GET"];
 
 /**
  * Send response to client options request.
@@ -90,13 +91,17 @@ const matchProductsId = (url) => {
  * @param {string} url filePath
  * @returns {boolean} true if matches, false otherwise
  */
+const matchOrdersId = (url) => {
+    return matchIdRoute(url, "orders");
+};
+
 const extractUserId = (url) => {
     const parts = url.split("/");
     return parts[parts.length - 1];
 };
 
 /**
- * Does the URL match /api/orders/{id}
+ * Does the URL match 
  * 
  * @param {string} url filePath
  * @returns {boolean} true if matches, false otherwise
@@ -108,7 +113,10 @@ function IsExistingPath(url) {
     if (matchProductsId(url)) {
         return true;
     }
-    
+    if (matchOrdersId(url)) {
+        return true;
+    }
+
     if ((url in allowedMethods)) {
         return true;
     }
@@ -123,7 +131,7 @@ function IsExistingPath(url) {
  * @returns {boolean} true if matches, false otherwise
  */
 function IsAllowedMethod(url, method) {
-    if (matchUserId(url) || matchProductsId(url)) {
+    if (matchUserId(url) || matchProductsId(url) || matchOrdersId(url)) {
         return true;
     }
     return allowedMethods[url].includes(method.toUpperCase());
@@ -349,6 +357,10 @@ const handleRequest = async (request, response) => {
     //GET all orders
     if (filePath === "/api/orders" && method.toUpperCase() === "GET") {
         
+        if (!acceptsJson(request)) {
+            return responseUtils.contentTypeNotAcceptable(response);
+        }
+
         const currentUser = await getCurrentUser(request);
         if (!currentUser) 
         return responseUtils.basicAuthChallenge(response);
@@ -365,23 +377,46 @@ const handleRequest = async (request, response) => {
     }
 
     //GET single order with OrderID
-    if (filePath.startsWith("/api/orders/") && method.toUpperCase() === "GET") {
-        
+    if (matchOrdersId(filePath)) {
+
         const currentUser = await getCurrentUser(request);
-        if (!currentUser) 
+
+        if (!currentUser) {
             return responseUtils.basicAuthChallenge(response);
+        }
+
+        if (!acceptsJson(request)) {
+            return responseUtils.contentTypeNotAcceptable(response);
+        }
 
         const orderId = extractUserId(filePath); // Extract orderId from URL
+        const order = await getOrderById(orderId);
 
-        const order = await getOrderById(response, orderId, currentUser);
+        if (!order) {
+            return responseUtils.notFound(response);
+        } else {
+            // Check if the user is an admin or the order owner (customer)
+            if (currentUser.role === "admin") {
+                return responseUtils.sendJson(response, order);
+            }
 
-        if (!order) return responseUtils.notFound(response); 
-
-        return responseUtils.sendJson(response, order);
+            if (currentUser.role === "customer" && order.customerId === currentUser._id.toString()) {
+                return responseUtils.sendJson(response, order);
+            } else {
+                // If the user doesn't have permissions, return 404
+                return responseUtils.notFound(response);
+            }
+        }
+            
     }
 
     //POST a new order
     if (filePath === "/api/orders" && method.toUpperCase() === "POST") {
+
+        if (!acceptsJson(request)) {
+            return responseUtils.contentTypeNotAcceptable(response);
+        }
+        
         const currentUser = await getCurrentUser(request);
         if (!currentUser) {
             return responseUtils.basicAuthChallenge(response);
@@ -417,8 +452,17 @@ const handleRequest = async (request, response) => {
             return responseUtils.badRequest(response, "Missing or invalid fields in items");
         }      
 
-        const newOrder = await createNewOrder(orderData, currentUser._id); 
-        return responseUtils.sendJson(response, newOrder, 201);      
+        try {
+            const newOrder = await createNewOrder(response, orderData, currentUser._id);
+            if (newOrder.statusCode === 201) {
+                return newOrder;
+            } else {
+                return responseUtils.badRequest(response, "Failed to create order");
+            }
+        } catch (error) {
+            return responseUtils.badRequest(response, "Failed to create order");
+        }
+ 
     }
 };
 

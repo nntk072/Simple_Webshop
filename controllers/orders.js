@@ -27,26 +27,18 @@ const getCustomerOrders = async (response, customerId) => {
 /**
  * Retrieve an order by ID and send it as JSON
  * 
- * @param {http.ServerResponse} response Response object to send the JSON to
  * @param {string} orderId ID of the order to retrieve
- * @param {object} currentUser Current user object with role information
  * @returns {Promise<void>} Promise resolved when order has been sent
  */
-const getOrderById = async (response, orderId, currentUser) => {
-    const order = await Order.findById(orderId);
-
-    if (!order) {
-      return responseUtils.notFound(response);
-    }
-
-    // Check if the current user is an admin or if the order belongs to the current user (customer)
-    if (currentUser.role === "admin" || order.customerId === currentUser._id) {
-      // Return the order if it belongs to the user or if the user is an admin
-      return responseUtils.sendJson(response, order);
-    } else {
-      // Unauthorized access for customer trying to access someone else's order
-      return responseUtils.notFound(response);
-    }
+const getOrderById = async (orderId) => {
+  try {
+      const order = await Order.findById(orderId).exec();
+      return order;
+  } catch (error) {
+      // Handle errors, such as database connectivity issues
+      console.error("Error fetching order by ID:", error);
+      return null;
+  }
 };
 
 /**
@@ -76,13 +68,11 @@ const createNewOrder = async (response, orderData, userId) => {
       return responseUtils.badRequest(response, "Missing or invalid fields in items");
   }
 
-  const newOrder = new Order({
-    customerId: userId,
-    items: orderData.items 
-  });
-
+  const newOrder = new Order(orderData);
+  newOrder.customerId = userId;
   await newOrder.save();
   return responseUtils.sendJson(response, newOrder, 201);
+  
 };
 
 module.exports = {
