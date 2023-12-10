@@ -1,11 +1,4 @@
 /**
- * Week 08 utility file for user related operations
- *
- * NOTE: This file will be abandoned during week 09 when a database will be used
- * to store all data.
- */
-
-/**
  * Use this object to store users
  *
  * An object is used so that users can be reset to known values in tests
@@ -36,18 +29,6 @@ const resetUsers = () => {
  * @returns {string} random string
  */
 const generateId = () => {
-    // let id;
-
-    // do {
-    //     // Generate unique random id that is not already in use
-    //     // Shamelessly borrowed from a Gist. See:
-    //     // https://gist.github.com/gordonbrander/2230317
-
-    //     id = Math.random().toString(36).substr(2, 9);
-    // } 
-    // while (data.users.some((u) => u._id === id));
-    // return id;
-    
     const id = Math.random().toString(36).substr(2, 9);
     
     if (data.users.some((u) => u._id === id)) {
@@ -94,7 +75,6 @@ const getUser = (email, password) => {
  * @returns {object|undefined} The user object or undefined if user not found
  */
 const getUserById = (userId) => {
-    // TODO: 8.4 Find user by user id
     const user = data.users.find((usr) => usr._id === userId);
     return user && { ...user };
 };
@@ -106,8 +86,6 @@ const getUserById = (userId) => {
  * @returns {object|undefined} deleted user or undefined if user does not exist
  */
 const deleteUserById = (userId) => {
-    // TODO: 8.4 Delete user with a given id
-    // Hint: Array's findIndex() with user ID can could be used to find the user, and Array's splice() method can be used to "extract" the user object.
     const index = data.users.findIndex((user) => user._id === userId);
     if (index === -1) return undefined;
 
@@ -132,8 +110,6 @@ const getAllUsers = () => data.users.map((user) => ({ ...user }));
  * Saves user only in memory until node process exits (no data persistence)
  * Save a copy and return a (different) copy of the created user
  * to prevent modifying the user outside this module.
- *
- * DO NOT MODIFY OR OVERWRITE users.json
  * 
  * @param {object} user object containing at least name, email and password
  * @returns {object} copy of the created user
@@ -162,7 +138,6 @@ const saveNewUser = (user) => {
  * @throws {Error} error object with message "Unknown role"
  */
 const updateUserRole = (userId, role) => {
-    // TODO: 8.4 Update user's role
     const index = data.users.findIndex((user) => user._id === userId);
     if (index === -1) return undefined;
     if (!data.roles.includes(role)) throw new Error("Unknown role");
